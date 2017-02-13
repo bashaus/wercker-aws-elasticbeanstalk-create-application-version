@@ -1,0 +1,53 @@
+name: aws-elasticbeanstalk-deploy
+version: 0.0.1
+summary: |
+  Deploys an artefact to an ElasticBeanstalk application
+tags:
+  - amazon
+  - aws
+  - eb
+  - elasticbeanstalk
+  - elastic beanstalk
+
+properties:
+  - name: application-name
+    type: string
+    required: true
+
+  - name: environment-name
+    type: string
+    required: true
+
+  - name: s3-version-bucket
+    type: string
+    required: true
+
+  - name: s3-version-key
+    type: string
+    required: false
+    default: $WERCKER_GIT_REPOSITORY/$WERCKER_GIT_COMMIT.zip
+
+  - name: artefact
+    type: string
+    required: false
+    default: $WERCKER_ROOT/$WERCKER_GIT_COMMIT.zip
+
+  - name: version-description
+    type: string
+    required: false
+    default: "User-Agent: Wercker"
+
+  - name: aws-access-key-id
+    type: string
+    required: false
+    default: $AWS_ACCESS_KEY_ID
+
+  - name: aws-secret-access-key
+    type: string
+    required: false
+    default: $AWS_SECRET_ACCESS_KEY
+
+  - name: aws-region
+    type: string
+    required: false
+    default: $AWS_DEFAULT_REGION
