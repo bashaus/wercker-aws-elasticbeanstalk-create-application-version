@@ -1,7 +1,7 @@
 # AWS ElasticBeanstalk Deploy
 
-Takes an artefact (ZIP, WAR, etc.), uploads it to an S3 bucket, creates a new
-application version in ElasticBeanstalk and deploys to an environment.
+Wercker step to upload an artefact (ZIP, WAR, etc.) to an S3 bucket, create a 
+new application version in ElasticBeanstalk and deploy it to an environment.
 
 ## Notes
 

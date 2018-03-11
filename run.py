@@ -31,7 +31,8 @@ def eb_application_version_exists():
         return False
 
 
-def s3_upload():
+
+def s3_upload_artefact():
     """
     Uploads the Artefact to S3 so that it can be used by Elastic Beanstalk.
     """
@@ -42,6 +43,8 @@ def s3_upload():
         Filename=str(_Artefact),
         Key=_S3VersionKey
     )
+
+
 
 def eb_check_version_processed():
     """
@@ -76,14 +79,17 @@ def eb_check_version_processed():
         log.error("Aborting: could not determine status of application version")
         exit(1)
 
+
+
 def eb_create_application_version():
     """
     Create a new Version in the Elastic Beanstalk Application.
     """
 
-    if not eb_application_version_exists():
-        s3_upload();
+    # Upload artefact to S3
+    s3_upload_artefact();
 
+    # Create application version
     log.debug(
         "Elastic Beanstalk: creating version '%s' in application '%s'",
         _EBVersionLabel,
@@ -101,7 +107,9 @@ def eb_create_application_version():
         Process=True
     )
 
+    # Check application version is processed
     eb_check_version_processed();
+
 
 
 def eb_environment_ready():
@@ -136,6 +144,7 @@ def eb_environment_ready():
         exit(1)
 
 
+
 def eb_environment_update():
     """
     Updates the Elastic Beanstalk Environment to use the new Version
@@ -156,6 +165,9 @@ def eb_environment_update():
     )
 
 
+
+# Init
+
 if __name__ == "__main__":
 
     # Setup logging
@@ -174,7 +186,7 @@ if __name__ == "__main__":
     _VersionDescription = os.environ["WERCKER_AWS_ELASTICBEANSTALK_DEPLOY_VERSION_DESCRIPTION"]
     _EBVersionLabel = os.environ["WERCKER_GIT_COMMIT"]
 
-    # Establish connection to Elastic Beanstalk
+    # Establish connection to Amazon Web Services
     AWSSession = boto3.Session(
         aws_access_key_id=os.environ["WERCKER_AWS_ELASTICBEANSTALK_DEPLOY_AWS_ACCESS_KEY_ID"],
         aws_secret_access_key=os.environ["WERCKER_AWS_ELASTICBEANSTALK_DEPLOY_AWS_SECRET_ACCESS_KEY"],
@@ -188,8 +200,12 @@ if __name__ == "__main__":
     # Establish connection to Elastic Beanstalk
     ElasticBeanstalkClient = AWSSession.client("elasticbeanstalk")
 
-    # If the version does not exist in Elastic Beanstalk, upload it
-    eb_create_application_version();
+    # Don't try to create a new version if it already exists
+    if not eb_application_version_exists():
+        # If the version does not exist in Elastic Beanstalk, upload it
+        eb_create_application_version();
+
+    # Update the environment to use the new application version
     eb_environment_update();
 
     exit(0)
